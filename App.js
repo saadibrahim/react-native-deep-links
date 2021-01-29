@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, Button} from 'react-native';
+import React, {useEffect} from 'react';
+import {View, Text, Button, Linking, Alert} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as RootNavigation from './RootNavigation';
@@ -27,8 +27,30 @@ function DetailsScreen() {
 const Stack = createStackNavigator();
 
 function App() {
+  const linking = {
+    prefixes: ['https://test.saadibrah.im', 'saadibrahim://'],
+  };
+
+  useEffect(() => {
+    // Get the deep link used to open the app
+    const getUrl = async () => {
+      const initialUrl = await Linking.getInitialURL();
+
+      if (initialUrl === null) {
+        return;
+      }
+
+      if (initialUrl.includes('Details')) {
+        Alert.alert(initialUrl);
+        RootNavigation.navigate('Details');
+      }
+    };
+
+    getUrl();
+  });
+
   return (
-    <NavigationContainer ref={RootNavigation.navigationRef}>
+    <NavigationContainer linking={linking} ref={RootNavigation.navigationRef}>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
